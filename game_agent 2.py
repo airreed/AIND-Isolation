@@ -39,10 +39,8 @@ def custom_score(game, player):
 
     if game.is_winner(player):
         return float("inf")
-    
     own_moves = len(game.get_legal_moves(player))
     opp_moves = len(game.get_legal_moves(game.get_opponent(player)))
-    
     score = float(own_moves - 2 * opp_moves)
 #    print("Score is ", score)
     return score
@@ -75,10 +73,9 @@ def custom_score_2(game, player):
 
     if game.is_winner(player):
         return float("inf")
-    
     own_moves = len(game.get_legal_moves(player))
     opp_moves = len(game.get_legal_moves(game.get_opponent(player)))
-    score = float(2 * own_moves - 3 * opp_moves)
+    score = float(own_moves - opp_moves)
     return score
 
 
@@ -104,19 +101,15 @@ def custom_score_3(game, player):
     float
         The heuristic value of the current game state to the specified player.
     """
-    if game.is_loser(player):
         return float("-inf")
 
     if game.is_winner(player):
         return float("inf")
-    
+    own_moves = len(game.get_legal_moves(player))
     opp_moves = len(game.get_legal_moves(game.get_opponent(player)))
-    
-    # get the distance from current position to center
-    w, h = game.width / 2., game.height / 2.
-    y, x = game.get_player_location(player)
-    score = float((h - y)**2 + (w - x)**2 - opp_moves)
+    score = float(2 * own_moves - opp_moves)
     return score
+
 
 class IsolationPlayer:
     """Base class for minimax and alphabeta agents -- this class is never
@@ -365,7 +358,6 @@ class AlphaBetaPlayer(IsolationPlayer):
             return best_move
         best_move = random.choice(legal_moves)
         
-#        depth_limit = game.width * game.height
 
         try:
             # The try/except block will automatically catch the exception
@@ -373,15 +365,11 @@ class AlphaBetaPlayer(IsolationPlayer):
 #            best_move = self.alphabeta(game, self.search_depth)
 #            print("Best move is : ", best_move, " value : ", value)
 #            return best_move
-
-            # iterative deepening from depth as 1 till the time limit
-            # keep the result of last iteration
-            # return the best from last search once reaches time limit
             depth = 1
             while self.time_left() > self.TIMER_THRESHOLD:
                 move = self.alphabeta(game, depth)
-#                if move == (-1, -1):
-#                    return best_move
+                if move == (-1, -1):
+                    return best_move
                 best_move = move
 #                print("depth: ", depth, " move: ", best_move)
                 depth += 1
@@ -479,11 +467,9 @@ class AlphaBetaPlayer(IsolationPlayer):
         for move in legal_moves:
 #            print("min move:", move, " at depth ", depth_left)
             max_move, value = self.max_player(game.forecast_move(move), depth_left - 1, alpha, beta)
-            # AlphaBeta prunning: if value is smaller, 
-            # this branch would never be chosen by the max_player
-            # so no need to explore this branch anymore
-            min_value = min(value, min_value)
-            if min_value <= alpha:
+            if value < min_value:
+                min_value = value
+            if value <= alpha:
                 return min_move, min_value
             if min_value < beta:
                 beta = min_value
@@ -523,11 +509,9 @@ class AlphaBetaPlayer(IsolationPlayer):
         for move in legal_moves:
 #            print("max move:", move, " at depth ", depth_left)
             min_move, value = self.min_player(game.forecast_move(move), depth_left - 1, alpha, beta)
-            # AlphaBeta prunning: if value is bigger, 
-            # this branch would never be chosen by the min_player
-            # so no need to explore this branch anymore            
-            max_value = max(value, max_value)
-            if max_value >= beta:
+            if value > max_value:
+                max_value = value
+            if value >= beta:
                 return max_move, max_value
             if max_value > alpha:
                 alpha = max_value

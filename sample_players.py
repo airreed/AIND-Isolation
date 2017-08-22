@@ -254,10 +254,11 @@ class HumanPlayer():
 
 if __name__ == "__main__":
     from isolation import Board
-
+    import game_agent
     # create an isolation board (by default 7x7)
-    player1 = RandomPlayer()
+    player1 = game_agent.AlphaBetaPlayer()
     player2 = GreedyPlayer()
+    # player2 = GreedyPlayer()
     game = Board(player1, player2)
 
     # place player 1 on the board at row 2, column 3, then place player 2 on
